@@ -11,6 +11,12 @@
 #include <time.h>
 using namespace std;
 
+#define STRAIGHT1000 0
+#define STRAIGHT4000 1
+#define TUENRIGHT90  2
+#define TURNLEFT90   3
+
+
 #include <cv.h>
 #include <highgui.h>
 using namespace cv;
@@ -70,23 +76,41 @@ int main(int argc, char *argv[])
 
 	*/
 	char MoveCommand[6];
-	int v,w;
-	char Dispatch[6] = "f0R0L";
+	char CleanCommand[2] = "c";
+	char StopCommand[2] = "s";
+	int v = 0, w = 0;
+	char Dispatch[6] = "quit";
+	int AccumulateDistance = 0;
+
+	cout << "Send command to Mobile!!(ex:f3R5L),or type 'quit' to leave)" << endl;
+	cout << "please enter LinearVelocity" << endl;
+	cin >> v;
+	cout << "please enter AngularVelocity" << endl;
+	cin >> w;
+	sprintf(MoveCommand,"f%dR%dL",v,v);
+
+	cout << "type 'quit' to leave" << endl;
 	while (true)
 	{
-		cout << "Send command to Mobile!!(ex:f3R5L),or type 'quit' to leave)" << endl;
-		cout << "please enter LinearVelocity" << endl;
-		cin >> v;
-		cout << "please enter AngularVelocity" << endl;
-		cin >> w;
-
-		sprintf(MoveCommand,"f%dR%dL",v,v);
-
-		//cin >> MoveCommand;
-		if (strcmp(MoveCommand, Dispatch) == 0)
+		AccumulateDistance = Mobile->Odometer();
+		if (strcmp(MoveCommand, Dispatch) == 0)  //disconnect
+		{
+			Mobile->SendCommand((unsigned char *)StopCommand,1);
+			Mobile->DisconnectMobile();
 			break;
+		}
+		else if (AccumulateDistance > 4000)    // stop when reach 4m
+		{
+			Mobile->SendCommand((unsigned char *)StopCommand,1);
+			Mobile->SendCommand((unsigned char *)CleanCommand,1);
+			Mobile->DisconnectMobile();
+			break;
+		}
 		else
+		{
 			Mobile->SendCommand((unsigned char *)MoveCommand, 5 );
+		}
+		cin >> MoveCommand;
 	}
 	
 	cout << "Disconnect all Device!!" << endl;

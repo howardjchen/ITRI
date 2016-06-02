@@ -38,7 +38,7 @@ public:
 	void SendCommand(unsigned char *command,int size);
 	static void SerialEventManager(uint32 object, uint32 event);
 	void DataArrival(int size, unsigned char *buffer);
-	int Odometer(int,int);
+	int Odometer();
 	vector<char> encoder_recv;
 	bool IsProcessOver;
 	int EncoderData[2];

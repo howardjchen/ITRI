@@ -127,7 +127,7 @@ void MobileControl::DataArrival(int size, unsigned char *buffer)
 		else
 			cal++;
 
-		int AccumulateDistance = m_pThis->Odometer(EncoderData[RIGHT],EncoderData[LEFT]);
+		int AccumulateDistance = m_pThis->Odometer();
 		printf("AccumulateDistance = %d \n",AccumulateDistance );
 
 
@@ -137,19 +137,13 @@ void MobileControl::DataArrival(int size, unsigned char *buffer)
 
 }
 
-int MobileControl::Odometer(int RightEncoder, int LeftEncoder)
+
+
+inline int MobileControl::Odometer()
 {
+	int DiffEncoder = EncoderData[LEFT] - EncoderData[RIGHT];
+	int AccumulateDistance = ( EncoderData[LEFT]+EncoderData[RIGHT])/2;
 
-	int DiffEncoder = LeftEncoder - RightEncoder;
-	int AccumulateDistance = (RightEncoder+LeftEncoder)/2;
-	char StopCommand[2] = "s";
-	char CleanCommand[2] = "c";
-
-	if (AccumulateDistance > 1000)
-	{
-		Mobile_Robot->sendData((unsigned char *)StopCommand,1);
-		Mobile_Robot->sendData((unsigned char *)CleanCommand,1);
-	}
 	return AccumulateDistance;
 
 
